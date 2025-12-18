@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>M3Dialog.js - Developer Documentation</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Google+Sans:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <script src="https://hc0t48ah6n.github.io/modal/modal.js" crossorigin="anonymous"></script>
+    <style>
+        :root {
+            --primary: #0b57d0;
+            --primary-container: #d3e3fd;
+            --surface: #f8f9fa;
+            --on-surface: #1f1f1f;
+            --outline: #747775;
+            --code-bg: #1e1e1e;
+            --accent: #c2e7ff;
+        }
+
+        body {
+            font-family: 'Roboto', 'Google Sans', sans-serif;
+            margin: 0;
+            background-color: var(--surface);
+            color: var(--on-surface);
+            line-height: 1.6;
+            scroll-behavior: smooth;
+        }
+
+        /* Language Switcher using Select */
+        .lang-switch-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+
+        .lang-select {
+            padding: 8px 16px;
+            border-radius: 12px;
+            border: 1px solid #dadce0;
+            background-color: white;
+            font-family: 'Google Sans', sans-serif;
+            font-size: 14px;
+            color: var(--on-surface);
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .lang-select:focus {
+            border-color: var(--primary);
+        }
+
+        /* Multilingual Content Control */
+        body[lang="ja"] .en-only { display: none !important; }
+        body[lang="en"] .ja-only { display: none !important; }
+
+        /* Layout */
+        .layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        nav {
+            width: 280px;
+            background: white;
+            border-right: 1px solid #dadce0;
+            padding: 40px 20px;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            overflow-y: auto;
+            box-sizing: border-box;
+        }
+
+        nav h3 {
+            font-size: 11px;
+            text-transform: uppercase;
+            color: var(--outline);
+            margin-bottom: 16px;
+            letter-spacing: 0.8px;
+        }
+
+        nav a {
+            display: block;
+            padding: 10px 16px;
+            text-decoration: none;
+            color: var(--on-surface);
+            border-radius: 8px;
+            margin-bottom: 4px;
+            font-size: 14px;
+            transition: background 0.2s;
+        }
+
+        nav a:hover {
+            background: #f1f3f4;
+        }
+
+        main {
+            flex: 1;
+            padding: 60px 40px;
+            max-width: 900px;
+        }
+
+        header h1 {
+            font-size: 3.5rem;
+            margin: 0;
+            color: var(--primary);
+            font-family: 'Google Sans';
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            background: var(--primary-container);
+            color: var(--primary);
+            border-radius: 100px;
+            font-size: 12px;
+            font-weight: 500;
+            margin-bottom: 16px;
+        }
+
+        section {
+            margin-bottom: 80px;
+        }
+
+        h2 {
+            font-family: 'Google Sans';
+            font-size: 2rem;
+            margin-bottom: 24px;
+            color: #444;
+        }
+
+        .card {
+            background: white;
+            padding: 32px;
+            border-radius: 28px;
+            border: 1px solid #dadce0;
+            margin-bottom: 24px;
+        }
+
+        code {
+            font-family: 'JetBrains Mono', monospace;
+            background: #f1f3f4;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+
+        pre {
+            background-color: var(--code-bg);
+            color: #dcdcdc;
+            padding: 24px;
+            border-radius: 16px;
+            overflow-x: auto;
+            font-family: 'JetBrains Mono', monospace;
+            line-height: 1.5;
+            font-size: 14px;
+            margin: 20px 0;
+        }
+
+        .highlight { color: #569cd6; }
+        .string { color: #ce9178; }
+        .comment { color: #6a9955; }
+
+        .btn {
+            background: var(--primary);
+            color: white;
+            padding: 14px 28px;
+            border-radius: 100px;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            font-family: 'Google Sans';
+            transition: box-shadow 0.2s;
+        }
+
+        .btn:hover {
+            box-shadow: 0 4px 12px rgba(11, 87, 208, 0.25);
+        }
+
+        .tip {
+            border-left: 4px solid #4caf50;
+            background: #f1f8e9;
+            padding: 16px 24px;
+            border-radius: 0 16px 16px 0;
+            margin: 20px 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+        }
+
+        th {
+            font-weight: 500;
+            color: var(--primary);
+        }
+
+        #demoBtn { display: none; }
+
+        @media (max-width: 768px) {
+            .layout { flex-direction: column; }
+            nav { width: 100%; height: auto; position: relative; border-right: none; border-bottom: 1px solid #ddd; }
+            main { padding: 40px 20px; }
+            header h1 { font-size: 2.5rem; }
+        }
+    </style>
+</head>
+<body lang="ja">
+
+<div class="lang-switch-container">
+    <select class="lang-select" onchange="setLang(this.value)" id="langSelect">
+        <option value="ja">日本語 (JP)</option>
+        <option value="en">English (EN)</option>
+    </select>
+</div>
+
+<div class="layout">
+    <nav>
+        <h3 class="ja-only">ドキュメント</h3>
+        <h3 class="en-only">DOCUMENTATION</h3>
+        <a href="#intro" class="ja-only">概要</a>
+        <a href="#intro" class="en-only">Introduction</a>
+        <a href="#install" class="ja-only">インストール</a>
+        <a href="#install" class="en-only">Installation</a>
+        <a href="#basic" class="ja-only">基本的な使い方</a>
+        <a href="#basic" class="en-only">Basic Usage</a>
+        <a href="#gas" class="ja-only">GASでの活用例</a>
+        <a href="#gas" class="en-only">GAS Integration</a>
+        <a href="#advanced" class="ja-only">高度な制御</a>
+        <a href="#advanced" class="en-only">Advanced Info</a>
+        <a href="#specs" class="ja-only">技術仕様</a>
+        <a href="#specs" class="en-only">Technical Specs</a>
+        <div style="margin-top: 40px;">
+            <button class="btn" style="width: 100%;" onclick="runDemo()">Live Demo</button>
+        </div>
+    </nav>
+
+    <main>
+        <section id="intro">
+            <span class="badge">v1.1.0 Released</span>
+            <header>
+                <h1>M3Dialog.js</h1>
+                <p class="ja-only">このAPIを使用するとシンプルでモダンなモーダルを簡単に表示できます。<br>Webアプリ、特にGoogle Apps Scriptのサイドバーやモーダルに最適化された、ゼロ・コンフィギュレーションなMaterial 3ダイアログライブラリです。</p>
+                <p class="en-only">This API allows you to easily display simple and modern modals. A zero-configuration, dependency-free Material 3 dialog library optimized for Web Apps, especially Google Apps Script (GAS) sidebars and modals.</p>
+            </header>
+        </section>
+
+        <section id="install">
+            <h2 class="ja-only">インストール</h2>
+            <h2 class="en-only">Installation</h2>
+            <div class="card">
+                <p class="ja-only">ビルドステップは不要です。CDN経由でインポートするだけで、グローバルな <code>M3Dialog</code> オブジェクトが利用可能になります。</p>
+                <p class="en-only">No build process required. Simply include the following script tag in your HTML header to access the global <code>M3Dialog</code> API.</p>
+                <pre>&lt;script 
+  src="https://hc0t48ah6n.github.io/modal/modal.js" 
+  crossorigin="anonymous"&gt;&lt;/script&gt;</pre>
+                <div class="tip">
+                    <strong class="ja-only">ヒント:</strong><strong class="en-only">Best Practice:</strong>
+                    <span class="ja-only">ネットワークエラーに備え、<code>typeof M3Dialog !== 'undefined'</code> でのチェックを推奨します。</span>
+                    <span class="en-only">Ensure the script is loaded by checking <code>typeof M3Dialog !== 'undefined'</code> before calling the show method.</span>
+                </div>
+            </div>
+        </section>
+
+        <section id="basic">
+            <h2 class="ja-only">基本的な使い方</h2>
+            <h2 class="en-only">Basic Usage</h2>
+            <div class="card">
+                <p class="ja-only">Promiseベースの設計により、ユーザーの対話を同期的なフローで記述できます。</p>
+                <p class="en-only">M3Dialog returns a Promise that resolves when the user interacts with the buttons. You can write clean code using <code>async/await</code>.</p>
+                <pre><span class="highlight">async function</span> <span class="highlight">confirmAction</span>() {
+  <span class="highlight">const</span> confirmed = <span class="highlight">await</span> M3Dialog.show({
+    title: <span class="string">"Delete Data"</span>,
+    message: <span class="string">"This action cannot be undone. Continue?"</span>,
+    yesText: <span class="string">"Delete"</span>,
+    noText: <span class="string">"Cancel"</span>
+  });
+
+  <span class="highlight">if</span> (confirmed) {
+    <span class="comment">// Resolves to true when yesText button is clicked</span>
+  }
+}</pre>
+                
+                <h3 class="ja-only">オプション一覧</h3>
+                <h3 class="en-only">API Properties</h3>
+                <table>
+                    <thead>
+                        <tr><th>Property</th><th>Type</th><th>Default</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td><code>title</code></td><td>String</td><td>""</td></tr>
+                        <tr><td><code>message</code></td><td>String</td><td>""</td></tr>
+                        <tr><td><code>yesText</code></td><td>String</td><td><span class="ja-only">"はい"</span><span class="en-only">"Yes"</span></td></tr>
+                        <tr><td><code>noText</code></td><td>String</td><td><span class="ja-only">"キャンセル"</span><span class="en-only">"No"</span></td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section id="gas">
+            <h2 class="ja-only">GASでの活用パターン</h2>
+            <h2 class="en-only">GAS Integration</h2>
+            <div class="card">
+                <p class="ja-only">Google Apps Scriptの <code>google.script.run</code> と組み合わせることで、サーバーサイド処理の実行前に強力なUIを提供できます。</p>
+                <p class="en-only">In Google Apps Script, you can prompt the user for confirmation before triggering server-side operations via <code>google.script.run</code>.</p>
+                <pre><span class="comment">// Example: Confirm before calling server side</span>
+<span class="highlight">async function</span> handleSave() {
+  <span class="highlight">const</span> ok = <span class="highlight">await</span> M3Dialog.show({
+    title: <span class="string">"Sync to Spreadsheet"</span>,
+    message: <span class="string">"Apply changes to the server now?"</span>
+  });
+
+  <span class="highlight">if</span> (ok) {
+    google.script.run
+      .withSuccessHandler(() => M3Dialog.show({title: <span class="string">"Success"</span>, message: <span class="string">"Sync complete."</span>}))
+      .processDataOnServer();
+  }
+}</pre>
+            </div>
+        </section>
+
+        <section id="advanced">
+            <h2 class="ja-only">高度な制御</h2>
+            <h2 class="en-only">Advanced Info</h2>
+            <div class="card">
+                <h3 class="ja-only">アニメーションとUX</h3>
+                <h3 class="en-only">Animations & UX</h3>
+                <p class="ja-only">M3Dialogは、クリック地点や要素の中心から広がる拡大アニメーションを採用し、Material 3の「流動的な動き」を再現しています。</p>
+                <p class="en-only">The library features a signature scale-up animation that follows Material 3 motion guidelines, providing a fluid and modern user experience.</p>
+                
+                <h3 class="ja-only">カプセル化されたスタイル</h3>
+                <h3 class="en-only">Self-contained Styles</h3>
+                <p class="ja-only">スタイルシートはJavaScriptの初期化時に自動的に <code>&lt;head&gt;</code> へ注入されるため、外部のCSSファイルを読み込む必要はありません。</p>
+                <p class="en-only">CSS styles are injected into the DOM dynamically upon execution. No external .css link tags are required in your project.</p>
+            </div>
+        </section>
+
+        <section id="specs">
+            <h2 class="ja-only">技術仕様</h2>
+            <h2 class="en-only">Technical Specs</h2>
+            <div class="card">
+                <ul>
+                    <li class="ja-only"><strong>軽量設計:</strong> 依存関係なし、純粋なJavaScriptのみ</li>
+                    <li class="en-only"><strong>Vanilla JS:</strong> Pure JS, zero dependencies.</li>
+                    <li class="ja-only"><strong>互換性:</strong> すべてのモダンブラウザに対応</li>
+                    <li class="en-only"><strong>Compatibility:</strong> Compatible with all modern evergreen browsers.</li>
+                    <li class="ja-only"><strong>ネイティブ準拠:</strong> <code>&lt;dialog&gt;</code> 要素と <code>::backdrop</code> による制御</li>
+                    <li class="en-only"><strong>Web Standards:</strong> Leverages native <code>&lt;dialog&gt;</code> and <code>::backdrop</code> APIs.</li>
+                </ul>
+            </div>
+        </section>
+
+        <footer style="margin-top: 100px; padding: 40px 0; border-top: 1px solid #ddd; font-size: 14px; color: var(--outline); text-align: center;">
+            <p class="ja-only">オープンソースライブラリ。世界中の開発者のために構築されました。</p>
+            <p class="en-only">Open-source library. Built for the global developer community.</p>
+            <p style="margin-top: 10px; font-weight: 500;">&copy; 2025 hc0t48ah6n</p>
+        </footer>
+    </main>
+</div>
+
+<!-- Dummy button for external JS compatibility -->
+<button id="demoBtn"></button>
+
+<script>
+    function setLang(lang) {
+        document.body.setAttribute('lang', lang);
+        const select = document.getElementById('langSelect');
+        if (select) select.value = lang;
+        localStorage.setItem('preferred-lang', lang);
+    }
+
+    window.onload = () => {
+        const savedLang = localStorage.getItem('preferred-lang') || 'ja';
+        setLang(savedLang);
+    };
+
+    async function runDemo() {
+        const lang = document.body.getAttribute('lang');
+        const config = lang === 'ja' ? {
+            title: "デベロッパーツール有効",
+            message: "M3Dialog.js は非同期処理を簡単に扱えるツールです。アニメーションを確認してください。",
+            yesText: "了解",
+            noText: "閉じる"
+        } : {
+            title: "Demo Activated",
+            message: "M3Dialog.js provides a seamless way to handle async interactions. Experience the motion!",
+            yesText: "Got it",
+            noText: "Dismiss"
+        };
+
+        if (typeof M3Dialog !== 'undefined') {
+            await M3Dialog.show(config);
+        } else {
+            alert("M3Dialog object not found.");
+        }
+    }
+</script>
+
+</body>
+</html>
